@@ -115,6 +115,7 @@ import {
   setSpanError,
   setSpanErrorAndException,
 } from './instrument';
+import { GetSession, GetSessionInterface } from './session-getter';
 
 export type GetDatabaseRolesCallback = RequestCallback<
   IDatabaseRole,
@@ -346,8 +347,7 @@ export interface RestoreOptions {
 class Database extends common.GrpcServiceObject {
   private instance: Instance;
   formattedName_: string;
-  pool_: SessionPoolInterface;
-  multiplexedSession_?: MultiplexedSessionInterface;
+  sessionFactory_: GetSessionInterface;
   queryOptions_?: spannerClient.spanner.v1.ExecuteSqlRequest.IQueryOptions;
   resourceHeader_: {[k: string]: string};
   request: DatabaseRequest;
@@ -460,14 +460,9 @@ class Database extends common.GrpcServiceObject {
       },
     } as {} as ServiceObjectConfig);
 
-    this.pool_ =
-      typeof poolOptions === 'function'
-        ? new (poolOptions as SessionPoolConstructor)(this, null)
-        : new SessionPool(this, poolOptions);
-    this.multiplexedSession_ =
-      typeof multiplexedSessionOptions === 'function'
-        ? new (multiplexedSessionOptions as MultiplexedSessionConstructor)(this)
-        : new MultiplexedSession(this, multiplexedSessionOptions);
+    this.sessionFactory_ = new GetSession(this, poolOptions, multiplexedSessionOptions);
+    this.pool_ = this.sessionFactory_.getPool()
+    this.multiplexedSession_ = this.sessionFactory_.getMultiplexedSession();
     if (typeof poolOptions === 'object') {
       this.databaseRole = poolOptions.databaseRole || null;
     }
@@ -479,9 +474,6 @@ class Database extends common.GrpcServiceObject {
     this.request = instance.request;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.requestStream = instance.requestStream as any;
-    this.pool_.on('error', this.emit.bind(this, 'error'));
-    this.pool_.open();
-    this.multiplexedSession_.createSession();
     //creating multiplexed session
     // this.database.createSession({multiplexed: true});
     this.queryOptions_ = Object.assign(
@@ -3033,7 +3025,7 @@ class Database extends common.GrpcServiceObject {
     const proxyStream: Transform = through.obj();
     const q = {sql: query, opts: this.observabilityConfig};
     return startTrace('Database.runStream', q, span => {
-      this.pool_.getSession((err, session) => {
+      this.sessionFactory_.getSession((err, session) => {
         if (err) {
           setSpanError(span, err);
           proxyStream.destroy(err);
@@ -3045,7 +3037,7 @@ class Database extends common.GrpcServiceObject {
 
         const snapshot = session!.snapshot(options, this.queryOptions_);
 
-        this._releaseOnEnd(session!, snapshot, span);
+        // this._releaseOnEnd(session!, snapshot, span);
 
         let dataReceived = false;
         let dataStream = snapshot.runStream(query);
