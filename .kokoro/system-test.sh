@@ -16,6 +16,8 @@
 
 set -eo pipefail
 
+set -x
+
 export NPM_CONFIG_PREFIX=${HOME}/.npm-global
 
 # Setup service account credentials.
