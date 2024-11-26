@@ -51,7 +51,8 @@
     "prelint": "cd samples; npm link ../; npm install",
     "precompile": "gts clean",
     "compile-protos": "compileProtos src",
-    "coverage": "c8 mocha build/test build/test/common && c8 report --check-coverage"
+    "coverage": "c8 mocha build/test build/test/common && c8 report --check-coverage",
+    "artifactregistry-login": "npm_config_registry=https://registry.npmjs.org npx google-artifactregistry-auth"
   },
   "dependencies": {
     "@google-cloud/common": "^5.0.0",

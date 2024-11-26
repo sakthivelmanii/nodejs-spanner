@@ -31,6 +31,15 @@ if [ -f .kokoro/pre-system-test.sh ]; then
     set -x
 fi
 
+# Enable airlock only for Kokoro presubmit jobs
+if [[ ! -z "${KOKORO_JOB_TYPE}" && ${KOKORO_JOB_TYPE} =~ ^.*presubmit.*$ ]]; then
+  cat > .npmrc <<EOL
+registry=https://us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/
+//us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/:always-auth=true
+EOL
+  npm_config_registry=https://registry.npmjs.org npx google-artifactregistry-auth
+fi
+
 npm install
 
 # If tests are running against main branch, configure flakybot
