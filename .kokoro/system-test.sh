@@ -34,7 +34,7 @@ if [ -f .kokoro/pre-system-test.sh ]; then
 fi
 
 # Enable airlock only for Kokoro presubmit jobs
-if [[ ! -z "${KOKORO_JOB_TYPE}" && ${KOKORO_JOB_TYPE} =~ ^.*presubmit.*$ ]]; then
+if [[ $ENABLE_AIRLOCK = 'true' ]]; then
   cat > .npmrc <<EOL
 registry=https://us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/
 //us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/:always-auth=true
