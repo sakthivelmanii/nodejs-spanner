@@ -35,7 +35,7 @@ registry=https://us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/
 EOL
 npm_config_registry=https://registry.npmjs.org npx google-artifactregistry-auth
 
-npm install
+npm install --verbose
 
 # Setup service account credentials.
 export GOOGLE_APPLICATION_CREDENTIALS=${KOKORO_GFILE_DIR}/secret_manager/long-door-651-kokoro-system-test-service-account
