@@ -33,16 +33,11 @@ if [ -f .kokoro/pre-system-test.sh ]; then
     set -x
 fi
 
-echo "ENV variable"
-echo $ENABLE_AIRLOCK
-# Enable airlock for system test
-if [[ $ENABLE_AIRLOCK = 'true' ]]; then
-  cat > .npmrc <<EOL
+cat > .npmrc <<EOL
 registry=https://us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/
 //us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/:always-auth=true
 EOL
-  npm_config_registry=https://registry.npmjs.org npx google-artifactregistry-auth
-fi
+npm_config_registry=https://registry.npmjs.org npx google-artifactregistry-auth
 
 npm install
 
