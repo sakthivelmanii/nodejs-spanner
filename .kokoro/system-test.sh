@@ -20,10 +20,6 @@ set -x
 
 export NPM_CONFIG_PREFIX=${HOME}/.npm-global
 
-# Setup service account credentials.
-export GOOGLE_APPLICATION_CREDENTIALS=${KOKORO_GFILE_DIR}/secret_manager/long-door-651-kokoro-system-test-service-account
-export GCLOUD_PROJECT=long-door-651
-
 cd $(dirname $0)/..
 
 # Run a pre-test hook, if a pre-system-test.sh is in the project
@@ -40,6 +36,10 @@ EOL
 npm_config_registry=https://registry.npmjs.org npx google-artifactregistry-auth
 
 npm install
+
+# Setup service account credentials.
+export GOOGLE_APPLICATION_CREDENTIALS=${KOKORO_GFILE_DIR}/secret_manager/long-door-651-kokoro-system-test-service-account
+export GCLOUD_PROJECT=long-door-651
 
 # If tests are running against main branch, configure flakybot
 # to open issues on failures:
