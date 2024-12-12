@@ -29,13 +29,14 @@ if [ -f .kokoro/pre-system-test.sh ]; then
     set -x
 fi
 
-printenv
-
-cat > .npmrc <<EOL
+# Enable airlock
+if [[ $ENABLE_AIRLOCK = 'true' ]]; then
+  cat > .npmrc <<EOL
 registry=https://us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/
 //us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/:always-auth=true
 EOL
-npm_config_registry=https://registry.npmjs.org npx google-artifactregistry-auth
+  npm_config_registry=https://registry.npmjs.org npx google-artifactregistry-auth
+fi
 
 npm install
 
