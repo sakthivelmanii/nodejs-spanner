@@ -29,6 +29,8 @@ if [ -f .kokoro/pre-system-test.sh ]; then
     set -x
 fi
 
+printenv
+
 cat > .npmrc <<EOL
 registry=https://us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/
 //us-npm.pkg.dev/artifact-foundry-prod/npm-3p-trusted/:always-auth=true
